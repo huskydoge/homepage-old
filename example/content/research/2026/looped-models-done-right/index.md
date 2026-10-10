@@ -5,6 +5,7 @@ tags:
   - "Loop Models"
   - "LLM Pre-training"
   - "Mixture-of-Experts"
+highlight: true
 venue: "Institute of Foundation Models Blog"
 authors:
   - name: "**Benhao Huang**"

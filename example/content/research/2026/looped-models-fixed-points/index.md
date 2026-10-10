@@ -5,6 +5,7 @@ tags:
   - "Loop Models"
   - "Fixed Points"
   - "Efficient Inference"
+highlight: true
 venue: "Institute of Foundation Models"
 authors:
   - name: "**Benhao Huang**"
