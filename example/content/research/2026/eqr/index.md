@@ -22,9 +22,9 @@ links:
     url: "https://arxiv.org/abs/2605.21488v1"
   - name: "Github"
     url: "https://github.com/locuslab/eqr"
-  - name: "X thread"
+  - name: "Tweet"
     url: "https://x.com/i/status/2057641657580064941"
-  - name: "X thread 2"
+  - name: "Tweet 2"
     url: "https://x.com/huskydogewoof/status/2058320088475037801?s=20"
 priority: -2
 ---

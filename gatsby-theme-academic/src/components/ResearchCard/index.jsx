@@ -98,7 +98,7 @@ const ResearchCard = (props) => {
       if (lowerName.includes('github')) {
         iconElement = <Icon icon={['fab', 'github']} fixedWidth style={{ marginRight: '0.25rem' }} />;
         displayName = link.name.trim();
-      } else if (lowerName.includes('twitter') || lowerName === 'x' || lowerName.includes('x post')) {
+      } else if (lowerName.includes('twitter') || lowerName.includes('tweet') || lowerName === 'x' || lowerName.includes('x post')) {
         iconElement = <Icon icon={['fab', 'twitter']} fixedWidth style={{ marginRight: '0.25rem' }} />;
         displayName = link.name.trim();
       } else if (lowerName === 'hugging face' || lowerName === 'huggingface' || lowerName === 'hf') {

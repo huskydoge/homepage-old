@@ -21,7 +21,7 @@ cover: "./preview.png"
 links:
   - name: "Blog"
     url: "https://ifm-research.notion.site/Towards-Looped-Models-Done-Right-3ade511912ec8128987dfeb7a5580043"
-  - name: "X thread"
+  - name: "Tweet"
     url: "https://x.com/huskydogewoof/status/2083242247945126203"
   - name: "Part II"
     url: "/research/2026/looped-models-fixed-points"

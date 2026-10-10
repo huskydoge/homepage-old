@@ -25,7 +25,7 @@ links:
     url: "https://github.com/ifm-ai/xllm-loop/blob/main/papers/part2.pdf"
   - name: "Github"
     url: "https://github.com/ifm-ai/xllm-loop"
-  - name: "X thread"
+  - name: "Tweet"
     url: "https://x.com/huskydogewoof/status/2106130737007091939"
   - name: "Part I"
     url: "https://huskydoge.github.io/husky-blog/posts/recursive_models/towards-looped-models-done-right/"
