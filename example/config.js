@@ -51,7 +51,7 @@ module.exports = {
   social: [
     {
       label: "CV",
-      url: "https://docs.google.com/document/d/17Plv8CVYGSZ-8BX4-iFgNfxreOb0WJPD3kCndufbyMo/edit?tab=t.0",
+      url: "/resume.pdf",
       icon: ["ai", "cv"],
     },
     {
