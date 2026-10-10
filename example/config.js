@@ -117,7 +117,7 @@ module.exports = {
   googleAnalyticTrackingId: process.env.GA_TRACKING_ID || "G-ZK3P43DY6M",
   education: [
     {
-      date: "Aug 2025 - Dec 2027 (expected)",
+      date: "Aug 2025 - Dec 2026 (expected)",
       icon: "university",
       title: "M.S. in Machine Learning",
       location: "Carnegie Mellon University"
