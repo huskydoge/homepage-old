@@ -1,0 +1,13 @@
+name = "visit-log"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+# Comma-separated origins allowed to send beacons.
+ALLOWED_ORIGINS = "https://huskydoge.github.io,http://localhost:8000"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "visit-log"
+# Filled in by `npx wrangler d1 create visit-log` (see README).
+database_id = "REPLACE_WITH_DATABASE_ID"

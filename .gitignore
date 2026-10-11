@@ -65,6 +65,11 @@ scripts/profile_monitor/config.local.json
 scripts/profile_monitor/state/
 !scripts/profile_monitor/README.md
 
+# Visit log worker local state
+!workers/visit-log/README.md
+workers/visit-log/.wrangler/
+workers/visit-log/.dev.vars
+
 # gatsby files
 .cache/
 public

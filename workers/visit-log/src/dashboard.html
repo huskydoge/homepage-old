@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Visit Log</title>
+<style>
+  :root { --bg: #fafaf9; --fg: #1c1917; --muted: #78716c; --line: #e7e5e4; --hit: #fef3c7; --accent: #2563eb; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1c1917; --fg: #f5f5f4; --muted: #a8a29e; --line: #44403c; --hit: #422006; --accent: #60a5fa; }
+  }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--fg); font: 14px/1.45 system-ui, sans-serif; }
+  h1 { font-size: 18px; margin: 0 0 12px; }
+  h2 { font-size: 15px; margin: 24px 0 8px; }
+  input, button { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; }
+  button { cursor: pointer; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .muted { color: var(--muted); }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; white-space: nowrap; }
+  tr.hit td { background: var(--hit); }
+  td.ua { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  code { font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>Visit Log</h1>
+<div class="row">
+  <input id="key" type="password" placeholder="Admin key" size="28">
+  <button id="load">Load</button>
+  <span id="status" class="muted"></span>
+</div>
+
+<h2>People (tracked links)</h2>
+<div class="row">
+  <input id="label" placeholder="Name, e.g. Jane Doe (Stanford)" size="32">
+  <input id="note" placeholder="Note (optional)" size="24">
+  <button id="create">Create link</button>
+  <span id="created" class="muted"></span>
+</div>
+<div class="scroll"><table id="links"></table></div>
+
+<h2>Visits</h2>
+<div class="row">
+  <input id="filter" placeholder="Filter: person, org, city, path…" size="32">
+  <label><input id="bots" type="checkbox"> show bots</label>
+  <label><input id="onlyKnown" type="checkbox"> only attributed or matching watch list</label>
+</div>
+<div class="row" style="margin-top:8px">
+  <input id="watch" placeholder="Watch orgs, comma separated" size="40" value="Stanford">
+</div>
+<p class="muted">Highlighted rows are visits attributed to a tracked link, or from a network whose org matches the watch list.</p>
+<div class="scroll"><table id="visits"></table></div>
+
+<script>
+const SITE = 'https://huskydoge.github.io/';
+const $ = (id) => document.getElementById(id);
+const store = {
+  get(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } },
+};
+let visits = [];
+
+$('key').value = store.get('visitlog-key');
+$('watch').value = store.get('visitlog-watch') || $('watch').value;
+
+async function api(path, options = {}) {
+  const res = await fetch(path, {
+    ...options,
+    headers: { Authorization: `Bearer ${$('key').value}`, 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.json();
+}
+
+function renderTable(table, columns, rows, rowClass) {
+  table.textContent = '';
+  const head = table.insertRow();
+  columns.forEach(([title]) => {
+    const th = document.createElement('th');
+    th.textContent = title;
+    head.appendChild(th);
+  });
+  rows.forEach((row) => {
+    const tr = table.insertRow();
+    if (rowClass) tr.className = rowClass(row);
+    columns.forEach(([, get, cls]) => {
+      const td = tr.insertCell();
+      if (cls) td.className = cls;
+      const value = get(row);
+      td.textContent = value === null || value === undefined ? '' : value;
+      if (cls === 'ua') td.title = td.textContent;
+    });
+  });
+}
+
+const fmt = (ts) => (ts ? new Date(ts).toLocaleString() : '');
+
+function renderVisits() {
+  const query = $('filter').value.trim().toLowerCase();
+  const watch = $('watch').value.split(',').map((w) => w.trim().toLowerCase()).filter(Boolean);
+  store.set('visitlog-watch', $('watch').value);
+  const matchesWatch = (v) => watch.some((w) => (v.as_org || '').toLowerCase().includes(w));
+  const rows = visits.filter((v) => {
+    if (!$('bots').checked && v.is_bot) return false;
+    if ($('onlyKnown').checked && !v.person && !matchesWatch(v)) return false;
+    if (!query) return true;
+    return [v.person, v.as_org, v.city, v.region, v.country, v.path, v.referrer, v.ref]
+      .some((field) => (field || '').toLowerCase().includes(query));
+  });
+  renderTable($('visits'), [
+    ['Time', (v) => fmt(v.ts)],
+    ['Person', (v) => (v.person ? `${v.person}${v.ref ? '' : ' (repeat)'}` : '')],
+    ['Network / org', (v) => v.as_org],
+    ['Place', (v) => [v.city, v.region, v.country].filter(Boolean).join(', ')],
+    ['Path', (v) => v.path],
+    ['Referrer', (v) => v.referrer],
+    ['Visitor', (v) => (v.vid || '').slice(0, 8)],
+    ['IP', (v) => v.ip],
+    ['Browser', (v) => v.ua, 'ua'],
+  ], rows, (v) => (v.person || matchesWatch(v) ? 'hit' : ''));
+}
+
+async function load() {
+  store.set('visitlog-key', $('key').value);
+  $('status').textContent = 'Loading…';
+  try {
+    const [l, v] = await Promise.all([api('/admin/links'), api('/admin/visits?limit=2000')]);
+    visits = v.visits;
+    renderTable($('links'), [
+      ['Person', (r) => r.label],
+      ['Note', (r) => r.note],
+      ['Link', (r) => `${SITE}?r=${r.token}`],
+      ['Clicks', (r) => r.clicks],
+      ['First click', (r) => fmt(r.first_click)],
+      ['Last click', (r) => fmt(r.last_click)],
+    ], l.links, (r) => (r.clicks ? 'hit' : ''));
+    renderVisits();
+    $('status').textContent = `${visits.length} visits loaded`;
+  } catch (error) {
+    $('status').textContent = error.message;
+  }
+}
+
+$('load').onclick = load;
+$('filter').oninput = renderVisits;
+$('watch').oninput = renderVisits;
+$('bots').onchange = renderVisits;
+$('onlyKnown').onchange = renderVisits;
+$('create').onclick = async () => {
+  try {
+    const r = await api('/admin/links', {
+      method: 'POST',
+      body: JSON.stringify({ label: $('label').value, note: $('note').value }),
+    });
+    $('created').textContent = `${SITE}?r=${r.token}`;
+    $('label').value = '';
+    $('note').value = '';
+    load();
+  } catch (error) {
+    $('created').textContent = error.message;
+  }
+};
+if ($('key').value) load();
+</script>
+</body>
+</html>
