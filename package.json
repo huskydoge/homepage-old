@@ -8,8 +8,7 @@
     "build": "yarn workspace example build",
     "develop": "yarn workspace example develop",
     "clean": "yarn workspace example clean",
-    "deploy": "yarn workspace example deploy",
-    "build:vercel": "yarn workspace example build && rm -rf public && cp -R example/public ./public"
+    "deploy": "yarn workspace example deploy"
   },
   "workspaces": [
     "gatsby-theme-academic",
