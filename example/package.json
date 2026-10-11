@@ -6,7 +6,6 @@
   "scripts": {
     "build": "gatsby build",
     "build:github": "gatsby build --prefix-paths",
-    "build:vercel": "gatsby build && rm -rf ../public && cp -R public ../public",
     "develop": "NODE_ENV=development gatsby develop",
     "clean": "gatsby clean",
     "deploy": "gatsby build --prefix-paths && gh-pages -f -d public"
